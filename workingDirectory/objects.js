@@ -76,6 +76,8 @@ const LearnerSubmissions = [
   }
 ];
 
+//console.log(LearnerSubmissions[3].learner_id)
+
 function getLearnerData(course, ag, submissions) {
   // here, we would process this data to achieve the desired result.
   const result = [
@@ -98,6 +100,15 @@ function getLearnerData(course, ag, submissions) {
 
 const result = getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions);
 
-console.log(result);
+//console.log(result);
 
 
+
+function getID(LearnerSubmissions) {
+    for (const i in LearnerSubmissions) {
+        console.log(`Learner ID: ${LearnerSubmissions[i].learner_id}`)
+    }
+
+}
+
+getID(LearnerSubmissions);
