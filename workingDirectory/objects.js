@@ -105,10 +105,63 @@ const result = getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions);
 
 
 function getID(LearnerSubmissions) {
+    let idArr = [];
     for (const i in LearnerSubmissions) {
-        console.log(`Learner ID: ${LearnerSubmissions[i].learner_id}`)
+        
+        idArr.push(LearnerSubmissions[i].learner_id)
     }
+
+    return idArr
 
 }
 
 getID(LearnerSubmissions);
+
+function getWeightedAvg(LearnerSubmissions, idArr){
+    let total1 = 0;
+    let total2 = 0;
+    let subCounter = 0;
+    let avg = total1 / subCounter;
+
+    console.log("Received IDs from getID: " + idArr);
+
+    for (const i in LearnerSubmissions) {
+        if (LearnerSubmissions[i].learner_id === idArr[i]){
+            
+            total1 += LearnerSubmissions[i].submission.score
+            subCounter += 1;
+
+            console.log(`ID: ${LearnerSubmissions[i].learner_id} adding ${LearnerSubmissions[i].submission.score} to total score: ${total1}`)
+            
+        } 
+        
+    }
+    
+ 
+}
+
+getWeightedAvg(LearnerSubmissions, getID(LearnerSubmissions))
+
+// Removes the duplicate values in array
+// to make working with the objects easier.
+function checkUniqueID(idArr){
+    let trackArr = [];
+
+    for (let i = 0; i <= idArr.length; i++){
+        trackArr.push(idArr[i]);
+    }
+    console.log("Old array:" + trackArr)
+
+    let newArr = [];
+    for (let i = 0; i < idArr.length; i++){
+        let temp = trackArr[i];
+        if (newArr.indexOf(temp) === -1){
+            newArr.push(temp);
+        }
+    }
+
+    console.log("New array: " + newArr);
+    return newArr;
+}
+checkUniqueID(getID(LearnerSubmissions));
+console.log("Test checking what function returns: " + checkUniqueID(getID(LearnerSubmissions)));
