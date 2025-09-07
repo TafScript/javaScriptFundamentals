@@ -94,7 +94,6 @@ function getLearnerData(course, ag, submissions) {
       2: 0.833 // late: (140 - 15) / 150
     }
   ];
-
   return result;
 }
 
@@ -102,17 +101,13 @@ const result = getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions);
 
 //console.log(result);
 
-
-
+// This function gets all the IDs from learners.
 function getID(LearnerSubmissions) {
     let idArr = [];
     for (const i in LearnerSubmissions) {
-        
         idArr.push(LearnerSubmissions[i].learner_id)
     }
-
     return idArr
-
 }
 
 getID(LearnerSubmissions);
@@ -130,38 +125,44 @@ function getWeightedAvg(LearnerSubmissions, idArr){
             
             total1 += LearnerSubmissions[i].submission.score
             subCounter += 1;
-
-            console.log(`ID: ${LearnerSubmissions[i].learner_id} adding ${LearnerSubmissions[i].submission.score} to total score: ${total1}`)
-            
-        } 
+            // uncomment this later to continue finishing work on this function.
+            //console.log(`ID: ${LearnerSubmissions[i].learner_id} adding ${LearnerSubmissions[i].submission.score} to total score: ${total1}`)
         
+        }    
     }
     
  
 }
-
+// modify parameters later to include unique id function to make working/calculating
+//easier
 getWeightedAvg(LearnerSubmissions, getID(LearnerSubmissions))
 
-// Removes the duplicate values in array
-// to make working with the objects easier.
+// This function removes the duplicate values in array
+// to make working with the objects easier to be used in calculating weighted average.
 function checkUniqueID(idArr){
     let trackArr = [];
 
-    for (let i = 0; i <= idArr.length; i++){
+    for (let i = 0; i < idArr.length; i++){
+        //make a copy of array 
         trackArr.push(idArr[i]);
     }
+    //development purposes
     console.log("Old array:" + trackArr)
-
+    // this array holds only unique element entries from the original array
     let newArr = [];
+    // compares array elements between newArr and trackArr and if it's not
+    // in newArr, it adds it to newArr, else it just continues iteration 
+    // ignoring duplicates.
     for (let i = 0; i < idArr.length; i++){
         let temp = trackArr[i];
         if (newArr.indexOf(temp) === -1){
             newArr.push(temp);
         }
     }
-
+    //Development purposes
     console.log("New array: " + newArr);
     return newArr;
 }
-checkUniqueID(getID(LearnerSubmissions));
+
+//checkUniqueID(getID(LearnerSubmissions));
 console.log("Test checking what function returns: " + checkUniqueID(getID(LearnerSubmissions)));
