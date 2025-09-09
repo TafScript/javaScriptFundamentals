@@ -101,42 +101,6 @@ const result = getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions);
 
 //console.log(result);
 
-// This function gets all the IDs from learners.
-function getID(LearnerSubmissions) {
-    let idArr = [];
-    for (const i in LearnerSubmissions) {
-        idArr.push(LearnerSubmissions[i].learner_id)
-    }
-    return idArr
-}
-
-getID(LearnerSubmissions);
-
-function getWeightedAvg(LearnerSubmissions, idArr){
-    let total1 = 0;
-    let total2 = 0;
-    let subCounter = 0;
-    let avg = total1 / subCounter;
-
-    console.log("Received IDs from getID: " + idArr);
-
-    for (const i in LearnerSubmissions) {
-        if (LearnerSubmissions[i].learner_id === idArr[i]){
-            
-            total1 += LearnerSubmissions[i].submission.score
-            subCounter += 1;
-            // uncomment this later to continue finishing work on this function.
-            //console.log(`ID: ${LearnerSubmissions[i].learner_id} adding ${LearnerSubmissions[i].submission.score} to total score: ${total1}`)
-        
-        }    
-    }
-    
- 
-}
-// modify parameters later to include unique id function to make working/calculating
-//easier
-getWeightedAvg(LearnerSubmissions, getID(LearnerSubmissions))
-
 // This function removes the duplicate values in array
 // to make working with the objects easier to be used in calculating weighted average.
 function checkUniqueID(idArr){
@@ -155,6 +119,7 @@ function checkUniqueID(idArr){
     // ignoring duplicates.
     for (let i = 0; i < idArr.length; i++){
         let temp = trackArr[i];
+        //add to array if index value isn't already in the array.
         if (newArr.indexOf(temp) === -1){
             newArr.push(temp);
         }
@@ -164,5 +129,64 @@ function checkUniqueID(idArr){
     return newArr;
 }
 
+// This function gets all the IDs from learners.
+function getID(LearnerSubmissions) {
+    let idArr = [];
+    for (const i in LearnerSubmissions) {
+        idArr.push(LearnerSubmissions[i].learner_id)
+    }
+    return idArr
+}
+
+getID(LearnerSubmissions);
+
+function getWeightedAvg(LearnerSubmissions, checkUniqueID, getID) {
+    const ids = getID(LearnerSubmissions);
+    const uniqueIDs = checkUniqueID(ids);
+
+    console.log("Unique learner IDs:", uniqueIDs);
+
+    let results = [];
+
+    for (const id of uniqueIDs) {
+        let totalScore = 0;
+        let totalPoints = 0;
+
+        // loop through submissions for this learner
+        for (const submission of LearnerSubmissions) {
+            if (submission.learner_id === id) {
+                // find matching assignment info
+                const assignment = AssignmentGroup.assignments.find(
+                    (a) => a.id === submission.assignment_id
+                );
+
+                if (assignment) {
+                    totalScore += submission.submission.score;
+                    totalPoints += assignment.points_possible;
+                }
+            }
+        }
+
+        
+        let avg = totalPoints > 0 ? (totalScore / totalPoints) * 100 : "0%";
+
+        results.push({
+            id: id,
+            avg: avg + "%"
+        });
+    }
+
+    console.log("Weighted averages:", results);
+    return results;
+}
+
+
+// modify parameters later to include unique id function to make working/calculating
+//easier
+getWeightedAvg(LearnerSubmissions, checkUniqueID, getID)
+
+
+
+
 //checkUniqueID(getID(LearnerSubmissions));
-console.log("Test checking what function returns: " + checkUniqueID(getID(LearnerSubmissions)));
+//console.log("Test checking what function returns: " + checkUniqueID(getID(LearnerSubmissions)));
