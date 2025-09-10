@@ -79,25 +79,68 @@ const LearnerSubmissions = [
 //console.log(LearnerSubmissions[3].learner_id)
 
 function getLearnerData(course, ag, submissions) {
+  // check if group course id belongs to course
+  if (AssignmentGroup.course_id !== CourseInfo.id){
+    throw new Error(`AssignmentGroup ${AssignmentGroup.id} does not belong to course ${CourseInfo.id}`);
+  }
+
   // here, we would process this data to achieve the desired result.
-  const result = [
-    {
-      id: 125,
-      avg: 0.985, // (47 + 150) / (50 + 150)
-      1: 0.94, // 47 / 50
-      2: 1.0 // 150 / 150
-    },
-    {
-      id: 132,
-      avg: 0.82, // (39 + 125) / (50 + 150)
-      1: 0.78, // 39 / 50
-      2: 0.833 // late: (140 - 15) / 150
+  const result = [];
+  
+  try {
+    const ids = getID(submissions);
+    const uniqueIDs = checkUniqueID(ids);
+
+    for (const id of uniqueIDs) {
+      let totalScore = 0;
+      let totalPoints = 0;
+
+      const learnerObj = {id};
+
+      for (const assignment of ag.assignments) {
+        const submission = submissions.find(
+          s => s.learner_id === id && s.assignment_id === assignment.id
+        );
+
+        if (!submission) continue;
+
+        const dateDue = new Date(assignment.due_at);
+        //const now = new Date("2023-12-31");
+        const now = new Date("")
+        // continue if date not due
+        if (dateDue > now) continue; 
+        // ensure data correct format for variales
+        let score = Number(submission.submission.score);
+        let points = Number(assignment.points_possible);
+        //data valid data input check
+        if (isNaN(score) || isNaN(points) || points <= 0) continue;
+        
+        const submittedDate = new Date(submission.submission.submitted_at);
+        //checks for late condition penalty.
+        if (submittedDate > dateDue){
+          score -= points * 0.1;
+        }
+        if (score < 0) {
+          score = 0;
+        }
+
+        totalScore += score;
+        totalPoints += points;
+      }
+
+      learnerObj.avg = totalPoints > 0 ? ((totalScore / totalPoints) * 100) + "%" : "0%";
+
+      result.push(learnerObj);
     }
-  ];
+  } catch (err) {
+    console.error("Invalid data input.", err);
+  }
+
   return result;
+
 }
 
-const result = getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions);
+
 
 //console.log(result);
 
@@ -126,6 +169,7 @@ function checkUniqueID(idArr){
     }
     //Development purposes
     console.log("New array: " + newArr);
+    console.log("=======================================")
     return newArr;
 }
 
@@ -167,8 +211,15 @@ function getWeightedAvg(LearnerSubmissions, checkUniqueID, getID) {
             }
         }
 
+        let avg;
+
+        try {
+            avg = totalPoints > 0 ? (totalScore / totalPoints) * 100 : "0%";
+        } catch (err) {
+            console.error("Invalid data input");
+            avg = "0%"
+        }
         
-        let avg = totalPoints > 0 ? (totalScore / totalPoints) * 100 : "0%";
 
         results.push({
             id: id,
@@ -176,7 +227,7 @@ function getWeightedAvg(LearnerSubmissions, checkUniqueID, getID) {
         });
     }
 
-    console.log("Weighted averages:", results);
+    console.log("Weighted Averages Output 1:", results);
     return results;
 }
 
@@ -184,6 +235,9 @@ function getWeightedAvg(LearnerSubmissions, checkUniqueID, getID) {
 // modify parameters later to include unique id function to make working/calculating
 //easier
 getWeightedAvg(LearnerSubmissions, checkUniqueID, getID)
+
+let output = getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions);
+console.log("Weighted Averages Output 2: ", output);
 
 
 
